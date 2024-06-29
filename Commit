@@ -6,7 +6,7 @@ from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler
 
 # Configurações do GitHub
-GITHUB_TOKEN = 'SEU_TOKEN_GITHUB'
+GITHUB_TOKEN = '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'
 OWNER = 'kaue431'
 REPO = 'panama-biblioteca'
 
