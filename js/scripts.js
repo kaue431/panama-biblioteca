@@ -226,3 +226,43 @@ document.addEventListener('DOMContentLoaded', function() {
     // Inicializar a tabela de aluguéis
     atualizarTabelaAlugueis();
 });
+
+// Função para realizar commit e push automático
+function autoCommit() {
+    const exec = require('child_process').exec;
+
+    // Defina o intervalo de tempo em milissegundos (por exemplo, 5 minutos)
+    const INTERVALO = 300000; // 300000 ms = 5 minutos
+
+    setInterval(function() {
+        // Comando Git para adicionar todos os arquivos alterados
+        exec('git add .', (err, stdout, stderr) => {
+            if (err) {
+                console.error(`Erro ao adicionar arquivos: ${err}`);
+                return;
+            }
+            console.log(`Arquivos adicionados: ${stdout}`);
+
+            // Comando Git para realizar commit com mensagem automática
+            exec('git commit -m "Autocommit $(date)"', (err, stdout, stderr) => {
+                if (err) {
+                    console.error(`Erro ao realizar commit: ${err}`);
+                    return;
+                }
+                console.log(`Commit realizado: ${stdout}`);
+
+                // Comando Git para enviar as alterações para o repositório remoto
+                exec('git push origin main', (err, stdout, stderr) => {
+                    if (err) {
+                        console.error(`Erro ao enviar para o repositório remoto: ${err}`);
+                        return;
+                    }
+                    console.log(`Alterações enviadas para o repositório remoto: ${stdout}`);
+                });
+            });
+        });
+    }, INTERVALO);
+}
+
+// Iniciar o salvamento automático
+autoCommit();
