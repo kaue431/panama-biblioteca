@@ -15,6 +15,10 @@ document.addEventListener('DOMContentLoaded', function() {
         { livro: 'Grande Sertão: Veredas', nome: 'Pedro', sala: 'Sala 2' }
     ];
 
+    // Inicializa o gráfico
+    const ctx = document.getElementById('grafico').getContext('2d');
+    let grafico;
+
     // Função para atualizar o gráfico
     function atualizarGrafico() {
         const dadosPorSala = {};
@@ -31,9 +35,12 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // Conta a quantidade de livros por gênero em cada sala
         alugueis.forEach(aluguel => {
-            if (dadosPorSala[aluguel.sala] && livros.find(livro => livro.titulo === aluguel.livro)) {
-                const genero = livros.find(livro => livro.titulo === aluguel.livro).genero;
-                dadosPorSala[aluguel.sala][genero] += 1;
+            const livro = livros.find(livro => livro.titulo === aluguel.livro);
+            if (livro && dadosPorSala[aluguel.sala]) {
+                if (!dadosPorSala[aluguel.sala][livro.genero]) {
+                    dadosPorSala[aluguel.sala][livro.genero] = 0;
+                }
+                dadosPorSala[aluguel.sala][livro.genero] += 1;
             }
         });
 
@@ -47,17 +54,16 @@ document.addEventListener('DOMContentLoaded', function() {
         const datasets = generos.map(genero => ({
             label: genero,
             data: labels.map(sala => dadosPorSala[sala][genero] || 0),
-            backgroundColor: randomColor(), // Função para gerar cores aleatórias (opcional)
+            backgroundColor: randomColor(),
         }));
 
         // Atualiza o gráfico
-        if (window.grafico) {
+        if (grafico) {
             grafico.data.labels = labels;
             grafico.data.datasets = datasets;
             grafico.update();
         } else {
-            const ctx = document.getElementById('grafico').getContext('2d');
-            window.grafico = new Chart(ctx, {
+            grafico = new Chart(ctx, {
                 type: 'bar',
                 data: {
                     labels: labels,
@@ -77,14 +83,11 @@ document.addEventListener('DOMContentLoaded', function() {
     // Atualiza o gráfico inicialmente
     atualizarGrafico();
 
-    // Função para gerar cores aleatórias (opcional)
+    // Função para gerar cores aleatórias
     function randomColor() {
-        const r = Math.floor(Math.random() * 255);
-        const g = Math.floor(Math.random() * 255);
-        const b = Math.floor(Math.random() * 255);
-        return `rgba(${r},${g},${b},0.6)`;
+        return '#' + Math.floor(Math.random() * 16777215).toString(16);
     }
 
-    // Função para atualizar o gráfico periodicamente (por exemplo, a cada 10 segundos)
+    // Atualiza o gráfico a cada 10 segundos
     setInterval(atualizarGrafico, 10000); // Atualiza a cada 10 segundos (10000 milissegundos)
 });
