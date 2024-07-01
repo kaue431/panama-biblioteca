@@ -1,118 +1,97 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-br">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gráfico de Gênero de Livros Mais Alugados por Sala</title>
-    <!-- Incluir Chart.js -->
+    <title>Aluguel de Livros</title>
+    <link rel="stylesheet" href="css/styles.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <style>
-        /* Estilos para o gráfico */
-        canvas {
-            display: block;
-            margin: auto;
-            max-width: 800px;
-            margin-top: 20px;
-        }
-    </style>
 </head>
 <body>
-    <div style="width: 80%; margin: auto;">
-        <h1>Gráfico de Gênero de Livros Mais Alugados por Sala</h1>
+    <header>
+        <h1>Aluguel de Livros na Biblioteca</h1>
+    </header>
+    <main>
+        <section id="livros">
+            <h2>Livros Disponíveis</h2>
+            <ul id="lista-livros">
+                <!-- Aqui serão listados os livros disponíveis -->
+            </ul>
+        </section>
+        <section id="aluguel">
+            <h2>Alugar Livro</h2>
+            <form id="form-aluguel">
+                <label for="nome">Seu Nome:</label>
+                <input type="text" id="nome" required>
+                <label for="sala">Sala:</label>
+                <input type="text" id="sala" required>
+                <label for="livro">Livro:</label>
+                <select id="livro" required>
+                    <!-- Aqui serão listadas as opções de livros disponíveis -->
+                </select>
+                <button type="submit">Alugar</button>
+            </form>
+        </section>
+    </main>
+    <section id="acesso-restrito">
+        <h2>Acesso Restrito</h2>
+        <form id="form-acesso">
+            <label for="senha">Senha:</label>
+            <input type="password" id="senha">
+            <button type="submit">Entrar</button>
+        </form>
+        <div id="admin-panel" style="display: none;">
+            <h3>Painel Administrativo</h3>
+            <form id="form-adicionar">
+                <h4>Adicionar Livro</h4>
+                <label for="tituloLivro">Título do Livro:</label>
+                <input type="text" id="tituloLivro" required>
+                <label for="generoLivro">Gênero:</label>
+                <input type="text" id="generoLivro" required>
+                <label for="quantidadeLivro">Quantidade:</label>
+                <input type="number" id="quantidadeLivro" required>
+                <button type="submit">Adicionar</button>
+            </form>
+            <form id="form-remover">
+                <h4>Remover Livro</h4>
+                <label for="livroId">ID do Livro:</label>
+                <input type="number" id="livroId" required>
+                <button type="submit">Remover</button>
+            </form>
+            <form id="form-devolucao">
+                <h4>Devolver Livro</h4>
+                <label for="codigoDevolucao">Código de Devolução:</label>
+                <input type="number" id="codigoDevolucao" required>
+                <button type="submit">Devolver</button>
+            </form>
+        </div>
+    </section>
+    <section id="tabela-alugueis">
+        <h2>Aluguéis</h2>
+        <table id="tabela">
+            <thead>
+                <tr>
+                    <th>Nome do Livro</th>
+                    <th>Nome do Aluguel</th>
+                    <th>Sala</th>
+                    <th>Data de Aluguel</th>
+                    <th>Data de Devolução</th>
+                    <th>Código de Devolução</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Aqui serão listados os aluguéis -->
+            </tbody>
+        </table>
+    </section>
+    <section id="grafico-section">
+        <h2>Gráfico de Aluguéis por Gênero e Sala</h2>
         <canvas id="grafico"></canvas>
-    </div>
-
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const livros = [
-                { id: 1, titulo: 'Dom Casmurro', genero: 'Romance', quantidade: 3, disponivel: true },
-                { id: 2, titulo: 'Memórias Póstumas de Brás Cubas', genero: 'Romance', quantidade: 2, disponivel: true },
-                { id: 3, titulo: 'O Cortiço', genero: 'Romance', quantidade: 1, disponivel: false },
-                { id: 4, titulo: 'Vidas Secas', genero: 'Romance', quantidade: 4, disponivel: true },
-                { id: 5, titulo: 'Grande Sertão: Veredas', genero: 'Romance', quantidade: 2, disponivel: true }
-            ];
-
-            let alugueis = [
-                { livro: 'Dom Casmurro', nome: 'João', sala: 'Sala 1' },
-                { livro: 'Memórias Póstumas de Brás Cubas', nome: 'Maria', sala: 'Sala 2' },
-                { livro: 'Dom Casmurro', nome: 'José', sala: 'Sala 1' },
-                { livro: 'Vidas Secas', nome: 'Ana', sala: 'Sala 3' },
-                { livro: 'Grande Sertão: Veredas', nome: 'Pedro', sala: 'Sala 2' }
-            ];
-
-            // Função para atualizar o gráfico
-            function atualizarGrafico() {
-                const dadosPorSala = {};
-
-                // Inicializa o objeto com contagem de gêneros por sala
-                livros.forEach(livro => {
-                    if (!dadosPorSala[livro.sala]) {
-                        dadosPorSala[livro.sala] = {};
-                    }
-                    if (!dadosPorSala[livro.sala][livro.genero]) {
-                        dadosPorSala[livro.sala][livro.genero] = 0;
-                    }
-                });
-
-                // Conta a quantidade de livros por gênero em cada sala
-                alugueis.forEach(aluguel => {
-                    if (dadosPorSala[aluguel.sala] && livros.find(livro => livro.titulo === aluguel.livro)) {
-                        const genero = livros.find(livro => livro.titulo === aluguel.livro).genero;
-                        dadosPorSala[aluguel.sala][genero] += 1;
-                    }
-                });
-
-                // Prepara os dados para o gráfico
-                const labels = Object.keys(dadosPorSala); // Salas
-                const generos = Object.keys(livros.reduce((acc, livro) => {
-                    acc[livro.genero] = true;
-                    return acc;
-                }, {})); // Todos os gêneros
-
-                const datasets = generos.map(genero => ({
-                    label: genero,
-                    data: labels.map(sala => dadosPorSala[sala][genero] || 0),
-                    backgroundColor: randomColor(), // Função para gerar cores aleatórias (opcional)
-                }));
-
-                // Atualiza o gráfico
-                if (window.grafico) {
-                    grafico.data.labels = labels;
-                    grafico.data.datasets = datasets;
-                    grafico.update();
-                } else {
-                    const ctx = document.getElementById('grafico').getContext('2d');
-                    window.grafico = new Chart(ctx, {
-                        type: 'bar',
-                        data: {
-                            labels: labels,
-                            datasets: datasets
-                        },
-                        options: {
-                            responsive: true,
-                            scales: {
-                                xAxes: [{ stacked: true }],
-                                yAxes: [{ stacked: true }]
-                            }
-                        }
-                    });
-                }
-            }
-
-            // Atualiza o gráfico inicialmente
-            atualizarGrafico();
-
-            // Função para gerar cores aleatórias (opcional)
-            function randomColor() {
-                const r = Math.floor(Math.random() * 255);
-                const g = Math.floor(Math.random() * 255);
-                const b = Math.floor(Math.random() * 255);
-                return `rgba(${r},${g},${b},0.6)`;
-            }
-
-            // Função para atualizar o gráfico periodicamente (por exemplo, a cada 10 segundos)
-            setInterval(atualizarGrafico, 10000); // Atualiza a cada 10 segundos (10000 milissegundos)
-        });
-    </script>
+    </section>
+    <footer>
+        <p>&copy; JK em 2024</p>
+    </footer>
+    <script src="js/scripts.js"></script>
 </body>
 </html>
