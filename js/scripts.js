@@ -1,10 +1,10 @@
 document.addEventListener('DOMContentLoaded', function() {
     const livros = [
-        { id: 1, titulo: 'Dom Casmurro', genero: 'Romance', quantidade: 3, disponivel: true },
-        { id: 2, titulo: 'Memórias Póstumas de Brás Cubas', genero: 'Romance', quantidade: 2, disponivel: true },
-        { id: 3, titulo: 'O Cortiço', genero: 'Romance', quantidade: 1, disponivel: false },
-        { id: 4, titulo: 'Vidas Secas', genero: 'Romance', quantidade: 4, disponivel: true },
-        { id: 5, titulo: 'Grande Sertão: Veredas', genero: 'Romance', quantidade: 2, disponivel: true }
+        { id: 1, titulo: 'Dom Casmurro', genero: 'Romance', quantidade: 3, disponivel: true, sala: 'Sala 1' },
+        { id: 2, titulo: 'Memórias Póstumas de Brás Cubas', genero: 'Romance', quantidade: 2, disponivel: true, sala: 'Sala 2' },
+        { id: 3, titulo: 'O Cortiço', genero: 'Romance', quantidade: 1, disponivel: false, sala: 'Sala 3' },
+        { id: 4, titulo: 'Vidas Secas', genero: 'Romance', quantidade: 4, disponivel: true, sala: 'Sala 1' },
+        { id: 5, titulo: 'Grande Sertão: Veredas', genero: 'Romance', quantidade: 2, disponivel: true, sala: 'Sala 2' }
     ];
 
     let alugueis = [
