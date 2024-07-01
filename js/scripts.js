@@ -1,5 +1,6 @@
 document.addEventListener('DOMContentLoaded', function() {
-    const livros = [
+    // Inicialização dos dados a partir do localStorage, se existirem, ou dados padrão
+    let livros = JSON.parse(localStorage.getItem('livros')) || [
         { id: 1, titulo: 'Dom Casmurro', genero: 'Romance', quantidade: 3, disponivel: true },
         { id: 2, titulo: 'Memórias Póstumas de Brás Cubas', genero: 'Romance', quantidade: 2, disponivel: true },
         { id: 3, titulo: 'O Cortiço', genero: 'Romance', quantidade: 1, disponivel: false },
@@ -7,7 +8,7 @@ document.addEventListener('DOMContentLoaded', function() {
         { id: 5, titulo: 'Grande Sertão: Veredas', genero: 'Romance', quantidade: 2, disponivel: true }
     ];
 
-    let alugueis = [];
+    let alugueis = JSON.parse(localStorage.getItem('alugueis')) || [];
 
     const listaLivros = document.getElementById('lista-livros');
     const selectLivro = document.getElementById('livro');
@@ -44,9 +45,6 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     }
-
-    exibirLivros();
-    exibirLivrosSelect();
 
     // Evento de submissão do formulário de aluguel
     const formAluguel = document.getElementById('form-aluguel');
@@ -100,6 +98,10 @@ document.addEventListener('DOMContentLoaded', function() {
         exibirLivros();
         exibirLivrosSelect();
         atualizarTabelaAlugueis();
+        
+        // Salvar no localStorage
+        localStorage.setItem('livros', JSON.stringify(livros));
+        localStorage.setItem('alugueis', JSON.stringify(alugueis));
     });
 
     // Evento de submissão do formulário de acesso restrito
@@ -146,6 +148,10 @@ document.addEventListener('DOMContentLoaded', function() {
         // Atualizar interface
         exibirLivros();
         exibirLivrosSelect();
+        atualizarTabelaAlugueis();
+
+        // Salvar no localStorage
+        localStorage.setItem('livros', JSON.stringify(livros));
     });
 
     formRemover.addEventListener('submit', function(event) {
@@ -166,6 +172,10 @@ document.addEventListener('DOMContentLoaded', function() {
         // Atualizar interface
         exibirLivros();
         exibirLivrosSelect();
+        atualizarTabelaAlugueis();
+
+        // Salvar no localStorage
+        localStorage.setItem('livros', JSON.stringify(livros));
     });
 
     formDevolucao.addEventListener('submit', function(event) {
@@ -193,14 +203,18 @@ document.addEventListener('DOMContentLoaded', function() {
         exibirLivros();
         exibirLivrosSelect();
         atualizarTabelaAlugueis();
+
+        // Salvar no localStorage
+        localStorage.setItem('livros', JSON.stringify(livros));
+        localStorage.setItem('alugueis', JSON.stringify(alugueis));
     });
 
     // Função para atualizar a tabela de aluguéis
     function atualizarTabelaAlugueis() {
         tabelaAlugueis.innerHTML = ''; // Limpa a tabela antes de recriá-la
         alugueis.forEach(aluguel => {
-            const row = tabelaAlugueis.insertRow();
-            row.innerHTML = `
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
                 <td>${aluguel.livro}</td>
                 <td>${aluguel.nome}</td>
                 <td>${aluguel.sala}</td>
@@ -209,60 +223,12 @@ document.addEventListener('DOMContentLoaded', function() {
                 <td>${aluguel.codigoDevolucao}</td>
                 <td>${aluguel.status}</td>
             `;
-
-            const dataDevolucao = new Date(aluguel.dataDevolucao);
-            const hoje = new Date();
-
-            if (hoje > dataDevolucao) {
-                row.classList.add('atrasado');
-                aluguel.status = 'Atrasado';
-            } else {
-                row.classList.add('dentro-do-prazo');
-                aluguel.status = 'Dentro do prazo';
-            }
+            tabelaAlugueis.appendChild(tr);
         });
     }
 
-    // Inicializar a tabela de aluguéis
+    // Exibir inicialmente os livros e a tabela de aluguéis
+    exibirLivros();
+    exibirLivrosSelect();
     atualizarTabelaAlugueis();
 });
-
-// Função para realizar commit e push automático
-function autoCommit() {
-    const exec = require('child_process').exec;
-
-    // Defina o intervalo de tempo em milissegundos (por exemplo, 5 minutos)
-    const INTERVALO = 300000; // 300000 ms = 5 minutos
-
-    setInterval(function() {
-        // Comando Git para adicionar todos os arquivos alterados
-        exec('git add .', (err, stdout, stderr) => {
-            if (err) {
-                console.error(`Erro ao adicionar arquivos: ${err}`);
-                return;
-            }
-            console.log(`Arquivos adicionados: ${stdout}`);
-
-            // Comando Git para realizar commit com mensagem automática
-            exec('git commit -m "Autocommit $(date)"', (err, stdout, stderr) => {
-                if (err) {
-                    console.error(`Erro ao realizar commit: ${err}`);
-                    return;
-                }
-                console.log(`Commit realizado: ${stdout}`);
-
-                // Comando Git para enviar as alterações para o repositório remoto
-                exec('git push origin main', (err, stdout, stderr) => {
-                    if (err) {
-                        console.error(`Erro ao enviar para o repositório remoto: ${err}`);
-                        return;
-                    }
-                    console.log(`Alterações enviadas para o repositório remoto: ${stdout}`);
-                });
-            });
-        });
-    }, INTERVALO);
-}
-
-// Iniciar o salvamento automático
-autoCommit();
